@@ -5,13 +5,27 @@
 ### A. Getting start
 Once wb32f10 started, the following message will be shown.
 
-	    ==================================================
-	    Simple WifiBoy esp32 System of Only 11 Forth Words
-	    20170507 derek@wifiboy.org & samsuanchen@gmail.com
-	    ==================================================
-	    < dsDepth 0 [ ] base10 >
-	    --------------------------------------------------
-	    inp 00 :
+    ets Jun  8 2016 00:22:57
+    
+    rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+    ets Jun  8 2016 00:22:57
+    
+    rst:0x10 (RTCWDT_RTC_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+    configsip: 0, SPIWP:0x00
+    clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+    mode:DIO, clock div:1
+    load:0x3fff0008,len:8
+    load:0x3fff0010,len:1848
+    load:0x40078000,len:6712
+    load:0x40080000,len:252
+    entry 0x40080034
+    ==================================================
+    Simple WifiBoy esp32 System of Only 11 Forth Words
+    20170508 derek@wifiboy.org & samsuanchen@gmail.com
+    ==================================================
+    < dsDepth 0 [ ] base10 >
+    --------------------------------------------------
+    inp 00 :
 Meaning: we could input forth words to execute or numbers (in base 10) to top of data stack. So far, data stack is empty (no numbers in bracket), hence the depth of data stack is 0. For example, if input "**0x100 100 2 $20 -1**" (the prefix 0x or $ can be used for entering hexadecimal numbers) then 5 decimal numbers **256 100 2 32 -1** will be shown in bracket.
 
 	00. <numbers> ( -- numbers ) enter numbers onto data stack
