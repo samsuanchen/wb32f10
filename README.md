@@ -52,37 +52,51 @@ Once wb32f10 started, the following message will be shown on the Serial Moniter.
     < dsDepth 5 [ 256 100 2 32 -1 ] base10 >
     --------------------------------------------------
     inp 00 :
-The names of 21 forth words and 5 decimal numbers (in bracket) on the data stack are shown and then waiting for our input. These 5 numbers were preloaded via  **V.interpret("0x100 100 2 $20 -1 words");** in the code setup as follows.
+The names of 21 forth words and 5 decimal numbers (in bracket) on the data stack are shown and then waiting for our input. Preloading the numbers and asking to show the names were because of **V.interpret("0x100 100 2 $20 -1 words");** in the code setup as follows.
 
 ![Connect Wifi Boy ESP32 to USB socket](jpg/08.jpg)
 
 Once we have numbers on the data stack, we could try the forth word **bin** to change the covertion base from 10 to 2.
 
-	01. bin ( -- ) set number convertion base B=2
+	01. bin ( -- ) set number conversion base B=2
 		inp 01 : bin
 		<dsDepth 5 [ 100000000 1100100 10 100000 11111111111111111111111111111111 ] base2 >
 
 We could try the forth word **oct** to change the number covertion base to 8.
 
-	02. oct ( -- ) set number convertion base B=8
+	02. oct ( -- ) set number conversion base B=8
 		inp 02 : oct
 		<dsDepth 5 [ 400 144 2 40 37777777777 ] base8 >
 
 We could try the forth word **dec** to change the number covertion base to 10.
 
-	03. dec ( -- ) set number convertion base B=10
+	03. dec ( -- ) set number conversion base B=10
 		inp 03 : dec
 		<dsDepth 5 [ 256 100 2 32 -1 ] base10 >
 
 We could try the forth word **hex** to change the number covertion base to 16.
 
-	04. hex ( -- ) set number convertion base B=16
+	04. hex ( -- ) set number conversion base B=16
 		inp 04 : hex
 		<dsDepth 5 [ 100 64 2 20 ffffffff ] base16 >
 
-Now, we could try some other arithmatic operations. For example, input "+" will do addition, pop last two numbers 32 and -1 from data stack, add them, and push back the sum 31 to data stack.
+How about if we try to set the base to decimal 12.
 
-	05. + ( a b -- a+b ) a add b
+	05. base! ( b -- ) set number conversion base B=b
+		inp 05 : dec 12 base!
+		< dsDepth 5 [ 194 84 2 28 9ba461593 ] base12 >
+
+If we try the forth word base@, one more number "10" will be added to the data stack (in base12).
+
+	06. base@ ( -- B ) get number conversion base B
+		inp 06 : base@
+		< dsDepth 6 [ .. 84 2 28 9ba461593 10 ] base12 >
+
+Entering "2 - base!" will change base to decimal 10 by .
+
+For example, input "+" will do addition, pop last two numbers 32 and -1 from data stack, add them, and push back the sum 31 to data stack.
+
+	07. + ( a b -- a+b ) a add b
 		inp 05 : +
 		<dsDepth 4 [ 100 64 2 1f ] base16 >
 
@@ -125,20 +139,20 @@ The word see is used to show the infomation of a given word. For example "see de
 	11. see <name> ( -- ) see the word of given name
 		inp 11 : see dec
 		----------------------
-		3f401338 prev 3f401344
-		3f40133c name 3f4012cb dec
-		3f401340 code 400d06f8
-		forth primative word dec 
-		< dsDepth 1 [ 6 ] base16 >
+		3f4012ec prev 3f4012f8
+		3f4012f0 name 3f4011f7 dec
+		3f4012f4 code 400d06d0
+		forth primative word dec
+		< dsDepth 1 [ -1 ] base10 >
 
 The last word dump is defined to show memory content of n cells at given address. For example, input "3f401338 9 dump" will show 9 memory cells at 0x3f401338 as follows.
 
 	12. dump ( a n -- ) show n cells at address a
-		inp 12 : 3f401338 9 dump
-		3f401338 : 3f401344 : 3f4012cb : 400d06f8 : 3f401350 : 44 : 13 : 40 : 3f : cb : 12 : 40 : 3f : f8 : 06 : 0d : 40 : 50 : 13 : 40 : 3f : D_@?__@?___@P_@?
-		3f401348 : 3f4012cf : 400d06ec : 00000000 : 3f4012d3 : cf : 12 : 40 : 3f : ec : 06 : 0d : 40 : 00 : 00 : 00 : 00 : d3 : 12 : 40 : 3f : __@?___@....__@?
-		3f401358 : 400d06e0 :          :          :          : e0 : 06 : 0d : 40 :    :    :    :    :    :    :    :    :    :    :    :    : ___@
-		< dsDepth 1 [ 6 ] base10 >
+		inp 12 : $3f4012ec 9 dump
+		3f4012ec : 3f4012f8 3f4011f7 400d06d0 3f401304 : f8 12 40 3f f7 11 40 3f d0 06 0d 40 04 13 40 3f : __@?__@?___@__@?
+		3f4012fc : 3f4011fb 400d06c0 00000000 3f4011ff : fb 11 40 3f c0 06 0d 40 00 00 00 00 ff 11 40 3f : __@?___@....__@?
+		3f40130c : 400d06b0                            : b0 06 0d 40                                     : ___@            
+		< dsDepth 1 [ -1 ] base10 >
 
 ### B. Ideas of project wb32f10
 
