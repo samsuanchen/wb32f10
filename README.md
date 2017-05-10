@@ -5,7 +5,7 @@
 ### A. Getting start
 1.Connect Wifi Boy ESP32 to USB socket.
 
-![Connect Wifi Boy ESP32 to USB socket](jpg/00.jpg | width=50%)
+![Connect Wifi Boy ESP32 to USB socket](jpg/00.jpg | width=50)
 
 2.Double lick wb32f10.ino in the project directory.
 
