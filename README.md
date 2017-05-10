@@ -1,9 +1,33 @@
 # wb32f10 -- wifiBoy esp32 forth proj 010
 
-## Simple WifiBoy esp32 System Having 11 Forth Primative Words
+## Simple WifiBoy esp32 System Having 21 Forth Primative Words
 
 ### A. Getting start
-Once wb32f10 started, the following message will be shown.
+1.Connect Wifi Boy ESP32 to USB socket.
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/00.jpg)
+
+2.Double lick wb32f10.ino in the project directory.
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/01.jpg)
+
+3.The source code of wb32f10.ino will be shown. Notice that the first line is **#include "wb32v10.h"** so we need move the directory wb32f10\libraries\wb32v10 to ardrino\libraries, at the first time. 
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/02.jpg)
+
+4.Then we could open the Serial Moniter by select the submenu item.
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/03.jpg)
+
+5.The empty Serial Moniter is opened.
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/04.jpg)
+
+6.Then we could click the arrow to build, burn, and run the code.
+
+![Connect Wifi Boy ESP32 to USB socket](jpg/05.jpg)
+
+Once wb32f10 started, the following message will be shown on the Serial Moniter.
 
     ets Jun  8 2016 00:22:57
     
@@ -20,43 +44,43 @@ Once wb32f10 started, the following message will be shown.
     load:0x40080000,len:252
     entry 0x40080034
     ==================================================
-    Simple WifiBoy esp32 System of Only 11 Forth Words
-    20170508 derek@wifiboy.org & samsuanchen@gmail.com
+    Simple WifiBoy ESP 32 Forth System having 21 Words
+    20170510 derek@wifiboy.org & samsuanchen@gmail.com
     ==================================================
-    < dsDepth 0 [ ] base10 >
+    
+    ms p@ p! lo hi inp out led dump see words / - * + base@ base! hex dec oct bin
+    < dsDepth 5 [ 256 100 2 32 -1 ] base10 >
     --------------------------------------------------
     inp 00 :
-Meaning: we could input forth words to execute or numbers (in base 10) to top of data stack. So far, data stack is empty (no numbers in bracket), hence the depth of data stack is 0. For example, if input "**0x100 100 2 $20 -1**" (the prefix 0x or $ can be used for entering hexadecimal numbers) then 5 decimal numbers **256 100 2 32 -1** will be shown in bracket.
+The names of 21 forth words and 5 decimal numbers (in bracket) on the data stack are shown and then waiting for our input. These 5 numbers were preloaded via  **V.interpret("0x100 100 2 $20 -1 words");** in the code setup as follows.
 
-	00. <numbers> ( -- numbers ) enter numbers onto data stack
-		inp 00 : 0x100 100 2 $20 -1
-		<dsDepth 5 [ 256 100 2 32 -1  ] base10 >
+![Connect Wifi Boy ESP32 to USB socket](jpg/08.jpg)
 
-We could input the forth word **bin** to change the covertion base from 10 to 2.
+Once we have numbers on the data stack, we could try the forth word **bin** to change the covertion base from 10 to 2.
 
 	01. bin ( -- ) set number convertion base B=2
 		inp 01 : bin
 		<dsDepth 5 [ 100000000 1100100 10 100000 11111111111111111111111111111111 ] base2 >
 
-We could input the forth word **oct** to change the number covertion base to 8.
+We could try the forth word **oct** to change the number covertion base to 8.
 
 	02. oct ( -- ) set number convertion base B=8
 		inp 02 : oct
 		<dsDepth 5 [ 400 144 2 40 37777777777 ] base8 >
 
-We could input the forth word **dec** to change the number covertion base to 10.
+We could try the forth word **dec** to change the number covertion base to 10.
 
 	03. dec ( -- ) set number convertion base B=10
 		inp 03 : dec
 		<dsDepth 5 [ 256 100 2 32 -1 ] base10 >
 
-We could input the forth word **hex** to change the number covertion base to 16.
+We could try the forth word **hex** to change the number covertion base to 16.
 
 	04. hex ( -- ) set number convertion base B=16
 		inp 04 : hex
 		<dsDepth 5 [ 100 64 2 20 ffffffff ] base16 >
 
-We could now try some arithmatic operations. For example, input "+" will do addition, pop last two numbers 32 and -1 from data stack, add them, and push back the sum 31 to data stack.
+Now, we could try some other arithmatic operations. For example, input "+" will do addition, pop last two numbers 32 and -1 from data stack, add them, and push back the sum 31 to data stack.
 
 	05. + ( a b -- a+b ) a add b
 		inp 05 : +
