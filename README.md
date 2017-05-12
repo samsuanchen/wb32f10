@@ -2,7 +2,10 @@
 
 ## Simple Wifi Boy ESP32 System Having 21 Forth Primitive Words
 
-### A. Getting start
+### A. Getting start of wb32f10
+
+#### a. Before Uploading wb32f10
+
 1.Connect Wifi Boy ESP32 to USB COM port.
 <img src="jpg/00.jpg" width=80%>
 
@@ -14,7 +17,7 @@
 
 <img src="jpg/02.jpg" width=80%>
 
-4.Then we could open the Serial Monitor by select the submenu item.
+4.Then we could open the Serial Monitor by selecting the submenu.
 
 <img src="jpg/03.jpg" width=80%>
 
@@ -22,7 +25,9 @@
 
 <img src="jpg/04.jpg" width=80%>
 
-6.Then we could click the arrow to build, burn, and run the code.
+#### b. Uploading wb32f10
+
+6.Then we could click the arrow to upload and start the code.
 
 <img src="jpg/05.jpg" width=80%>
 
@@ -60,6 +65,7 @@ And the following message will be shown on the Serial Monitor.
 
 <img src="jpg/07.jpg" width=80%>
 
+#### c. Testing wb32f10
 Once we have numbers on the data stack (shown in bracket), we could try the forth word **bin** to change the conversion base from 10 to 2.
 
 	01. bin ( -- ) set number conversion base B=2
@@ -163,8 +169,8 @@ The forth word dump is defined to show content of n memory cells at given addres
 
 In the following, let's try to turn off the blue led on the back of wifi boy esp32. The way to turn off the led is to pull up the led pin to electric level HIGH. The forth word **led** will give the number 16, the gpio pin number of the blue led. And the forth word **hi** will pull up the led pin to electric level HIGH. So we could input "**led hi**" to turn off the blue led.
 
-	15.	led ( -- 16  ) give decimal 16 (gpio pin number of the blue led)
-	16.	hi  ( pin -- ) pull up digital OUTPUT pin to electric level HIGH
+	15. led ( -- 16  ) give decimal 16 (gpio pin number of the blue led)
+	16. hi  ( pin -- ) pull up digital OUTPUT pin to electric level HIGH
 		inp 15 : led hi
 		< dsDepth 1 [ 6 ] base10 >
 
@@ -172,37 +178,63 @@ In the following, let's try to turn off the blue led on the back of wifi boy esp
 
 The forth word lo will pull down the led pin to electric level LOW.  So we could input "**led lo**" to turn on the blue led.
 
-	17.	lo  ( pin -- ) pull down digital OUTPUT pin to electric level LOW
+	17. lo ( pin -- ) pull down digital OUTPUT pin to electric level LOW
 		inp 16 : led lo
 		< dsDepth 1 [ 6 ] base10 >
 
 The forth word **ms** could be used to wait for give number of milliseconds. And hence, we could input "led lo 250 ms led hi 250 ms led lo 250 ms led hi 250 ms" to on/off the led 4 times in two seconds.
 
-	18.	ms  ( n -- ) wait for n milliseconds
+	18. ms ( n -- ) wait for n milliseconds
 		inp 17 : led lo 250 ms led hi 250 ms led lo 250 ms led hi 250 ms led lo 250 ms led hi 250 ms led lo 250 ms led hi 250 ms
 		< dsDepth 1 [ 6 ] base10 >
 
 Normally, the forth word **out** should be used to set gpio pin mode direction as OUTPUT before writing HIGH/LOW to the digital OUTPUT pin. In the same way, the forth word **inp** should be used to set gpio pin mode direction as INPUT before reading a digital INPUT pin. On wifi boy esp32, 8 buttons could be tried, namely gpio 17, 23, 27, 32, 33, 34, 39. 
 
-	19.	out ( pin -- ) set gpio pin mode direction as OUTPUT
-	20.	inp ( pin -- ) set gpio pin mode direction as INPUT
-	21.	p! ( v pin -- ) write v to digital OUTPUT pin (v=0 for LOW or v=1 for HIGH)
-	22.	p@ ( pin -- v ) read v from digital INPUT pin (v=0 for LOW or v=1 for HIGH)
+	19. out ( pin -- ) set gpio pin mode direction as OUTPUT
+	20. inp ( pin -- ) set gpio pin mode direction as INPUT
+	21. p! ( v pin -- ) write v to digital OUTPUT pin (v=0 for LOW or v=1 for HIGH)
+	22. p@ ( pin -- v ) read v from digital INPUT pin (v=0 for LOW or v=1 for HIGH)
 
 Alternatively, we could use "1 16 p!" to turn off or "0 16 p!" to turn on the blue led. 
 
+#### d. Vocaburaly of wb32f10
+
+	01. bin ( -- ) set number conversion base B=2
+	02. oct ( -- ) set number conversion base B=8
+	03. dec ( -- ) set number conversion base B=10
+	04. hex ( -- ) set number conversion base B=16
+	05. base! ( b -- ) set number conversion base B=b
+	06. base@ ( -- B ) get number conversion base B
+	07. + ( a b -- a+b ) a add b
+	08. * ( a b -- a*b ) a multiply b
+	09. - ( a b -- a-b ) a subtract b
+	10. / ( a b -- a/b ) a divide b
+	11. words ( -- ) show all forth word names
+	12. words <string> ( -- ) show all forth word names including given string
+	13. see <name> ( -- ) see the word of given name
+	14. dump ( a n -- ) show n cells at address a
+	15. led ( -- 16  ) give decimal 16 (gpio pin number of the blue led)
+	16. hi  ( pin -- ) pull up digital OUTPUT pin to electric level HIGH
+	17. lo ( pin -- ) pull down digital OUTPUT pin to electric level LOW
+	18. ms ( n -- ) wait for n milliseconds
+	19. out ( pin -- ) set gpio pin mode direction as OUTPUT
+	20. inp ( pin -- ) set gpio pin mode direction as INPUT
+	21. p! ( v pin -- ) write v to digital OUTPUT pin (v=0 for LOW or v=1 for HIGH)
+	22. p@ ( pin -- v ) read v from digital INPUT pin (v=0 for LOW or v=1 for HIGH)
 
 ### B. Intention of project wb32f10
 
 01. Forth Promotion
 
+01. Interactive
+
 02. Rapid Prototyping
 
-03. More Resources As Much As Possible
+03. Using Resources As Much As Possible
 
-04. More Top Down
+04. Top Down design
 
-05. Less Bottom Up
+05. Bottom Up testing
 
 06. More Application Programming
 
@@ -210,24 +242,67 @@ Alternatively, we could use "1 16 p!" to turn off or "0 16 p!" to turn on the bl
 
 ### C. Implementation of project wb32f10
 
-01. Collect Characters To Terminal Input Buffer
+#### a. system structure
 
-02. Parse Token From Terminal Input Buffer
+01. forth word, 3 pointers for each
 
-03. Convert Number to Digits In Given Base
+02. vocabulay, a link list of forth words (dictionary)
 
-04. Convert Digits to Number In Given Base
+03. data stack, an array of numbers
 
-05. Search Forth Word In Forth Vocabulary
+#### b. user interface
 
-06. See Forth Word
+01. prompt()
 
-07. Dump Memory Content of Forth System
+02. setup()
+
+03. loop()
+
+#### c. virtual machine
+
+01. V.readLine(), read a input line 
+
+02. V.interpret(), interpret line
+
+03. V.parseToken(),
+
+04. V.searchVoc(), search name in vocabulary to find the forth word
+
+#### d. tools
+
+01. V.words(), show names of forth words
+
+02. V.see(), show forth word
+
+03. V.dump(), show memory cells
 
 ### D. Extention of project wb32f10
 
-01. Add More Forth Words Into Forth Vocabulary
+01. add new forth word to vocabulary
 
-02. The Constructs Of Forth Branchs And Loops
+### E. Future Work
 
-03. Implementation of Colon and Semi Colon
+#### a. More Useful Construct Words for Programming 
+
+01. Branch and Loop 
+
+02. Colon and Semicolon
+
+03. Constant and Variable
+
+04. Value
+
+05. Current Vocabulary and Context Vocabularies
+
+#### b. More Smart Tool
+
+#### c. Evaluation of Infix Arithmetic Expression
+
+#### d. File System
+
+#### e. Execution of OS Shell Commands
+
+
+
+
+

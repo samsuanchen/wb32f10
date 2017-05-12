@@ -2,16 +2,17 @@
 #define _WB32V10_H_
 //vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv wb32v10.c vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 #include "Arduino.h"
-#define PRINTF Serial.printf
-#define AVAILABLE Serial.available
-#define READ Serial.read
-#define WRITE Serial.write
 
-#define TIB_SIZE 1024
-#define TMP_SIZE  256
-#define DS_DEPTH   32
+#define PRINTF		Serial.printf
+#define AVAILABLE	Serial.available
+#define READ		Serial.read
+#define WRITE		Serial.write
 
-#define DS_LIMIT (DS+DS_DEPTH-1) // data stack limit
+#define TIB_SIZE 	1024
+#define TMP_SIZE	256
+#define DS_DEPTH	32
+#define DS_LIMIT	(DS+DS_DEPTH-1) // data stack limit
+#define LAST NULL
 
 typedef void (*FuncP) (); // function code pointer type
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,7 @@ class WB32V10 {
 	boolean tibEmpty (); // check if buffer is empty
 	boolean tibFull (); // check if buffer is full
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void	waitInput();
 	char*	readLine (); // read an input line
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void	parseBegin (char* str); // begin to parse
@@ -64,10 +66,10 @@ class WB32V10 {
     void	setBase(int base); // set number convertion base
     int		getBase(); // get number convertion base
     Voc*    getVoc();
-    Word*	vocSearch(Voc *voc, char *name);
-    void	words(); // show all word names having specific substring
-    void 	see(); // show the forth word of given name
-    void	dump(); // dump ( adr n -- ) // dump n cells at adr
+    Word*	vocSearch(char *name);
+    void	words(char *sub); // show all word names having specific substring
+    void 	see(Word *w); // show the forth word w
+    void	dump(int *a, int n); // dump ( adr n -- ) // dump n cells at adr
     void	vocInit (Word* last); // initialize the vocabulary of forth words
   private:
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

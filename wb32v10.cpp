@@ -10,6 +10,10 @@ boolean WB32V10::whiteSpace (char c) { return c==' '||c=='\t'||c=='\n'||c=='\r';
 boolean WB32V10::tibEmpty   (){ return tibEnd==tibBegin; } // check if buffer is empty
 boolean WB32V10::tibFull    (){ return tibEnd==tibLimit; } // check if buffer is full
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+void	WB32V10::waitInput() { // read input characters until end of line
+  while ( !AVAILABLE() ); // wait until input available
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 char*	WB32V10::readLine() { // read input characters until end of line
   tibOpen();
   while ( AVAILABLE() ) {
@@ -22,7 +26,7 @@ char*	WB32V10::readLine() { // read input characters until end of line
     } else {
       tibPush(c); // collect character c
       WRITE(c);
-      while ( !AVAILABLE() ); // wait until available
+      waitInput(); // wait until input available
     }
   }
 }
@@ -63,7 +67,7 @@ void	WB32V10::interpret(char *line){
 void	WB32V10::eval(char *token){
 // extern Word, forth, getBase, vocSearch, hexPrefix, Serial.printf, dsPush
   char *remain, *p=token, c;
-  Word* w=vocSearch(voc,token);
+  Word* w=vocSearch(token);
   if(w){ w->code(); return; }
   int b=getBase(); if(remain=hexPrefix(token)) p=remain, b=16; 
   int n=strtol(p, &remain, b); // conver string at p to integer n on base b (*remain is an illigal digit)
@@ -107,19 +111,18 @@ char*	WB32V10::hexPrefix(char *s) { // 0xff 0XFF $ff $FF $Ff are all acceptable 
   if(c=='0' && (c=*s++) != 'x' && c != 'X') return 0;
   return s; // remain string
 }
-Word*	WB32V10::vocSearch (Voc *voc, char *name) { // search name in dict
-  Word *w=voc->last; while ( w && strcmp(w->name,name) ) w=w->prev; return w;
+Word*	WB32V10::vocSearch (char *name) { // search name in dict
+  Word *w=getVoc()->last; while ( w && strcmp(w->name,name) ) w=w->prev; return w;
 }
 Voc*	WB32V10::getVoc() {
   return voc;
 }
 #define CONSOLE_WIDTH 80
 //.......................................................................................................
-void WB32V10::words() { // show all word names having specific substring
+void WB32V10::words(char*sub) { // show all word names having specific substring
   PRINTF("\n");
   int m=0, n;
   Word *w=getVoc()->last;
-  char*sub=parseToken();
   while (w) { 
     if(!*sub || strstr(w->name,sub) ){
       n=strlen(w->name);
@@ -131,8 +134,7 @@ void WB32V10::words() { // show all word names having specific substring
   }
 }
 //.......................................................................................................
-void WB32V10::see() { // show the forth word of given name
-  Word *w = vocSearch(getVoc(),parseToken());
+void WB32V10::see(Word *w) { // show the forth word
   if(!w){ PRINTF(" ? undefinded "); return; }
   PRINTF("\n----------------------");
   PRINTF("\n%x prev %08x"            ,&w->prev,w->prev        );
@@ -141,34 +143,32 @@ void WB32V10::see() { // show the forth word of given name
   PRINTF("\nforth primative word %s ", w->name                );
 }
 //.......................................................................................................
-void WB32V10::dump() { // dump ( adr n -- ) // dump n cells at adr
+void WB32V10::dump(int *a,int n) { // dump n cells at adr
 // extern dsPop, PRINTF
-    int n=dsPop();
-    int *adr=(int*)dsPop();
-    int *lmt=adr+n;
-    char *badr;
+    int *lmt=a+n;
+    char *ba;
     char *blmt;
-    for( ; adr<lmt; adr+=4) { 
-      PRINTF("\n%8.8x : ", (int) adr);
+    for( ; a<lmt; a+=4) { 
+      PRINTF("\n%8.8x : ", (int) a);
       for(int i=0; i< 4; i++){
-        if( adr+i>=lmt )PRINTF("         ");
-        else            PRINTF("%8.8x ", *( adr+i));
+        if( a+i>=lmt )PRINTF("         ");
+        else          PRINTF("%8.8x ", *( a+i));
       }
       PRINTF(": ");
-      badr=(char*)adr, blmt=(char*)lmt;
+      ba=(char*)a, blmt=(char*)lmt;
       for(int i=0; i<16; i++){
-        if(badr+i>=blmt)PRINTF("   ");
-        else            PRINTF("%2.2x ", *(badr+i));
+        if(ba+i>=blmt)PRINTF("   ");
+        else          PRINTF("%2.2x ", *(ba+i));
       }
       PRINTF(": ");
       for(int i=0; i<16; i++){
-        if(badr+i>=blmt)PRINTF(" ");
+        if(ba+i>=blmt)PRINTF(" ");
         else {
-          char c=*(badr+i); n=(int)c;
+          char c=*(ba+i); n=(int)c;
           if( n==0 ) c='.';
           else if( n<0x20 || (n>0x7e&&n<0xa4) || n>0xc6 ) c='_';
           else if(n>=0xa4&&n<=0xc6) { // head-byte of commmon big5
-            n=(int)*(badr+i+1);
+            n=(int)*(ba+i+1);
             if( n<0x40 || (n>0x7e&&n<0xa1) || n>0xfe) c='_'; // next is not tail-byte of commmon big5 
             else PRINTF("%c",c), c=(char)n, i++; // show head-byte of commmon big5 and get tail-byte
           }
